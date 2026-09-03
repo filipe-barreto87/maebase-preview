@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#fdf6fa">
+<title>MãeBase · Protótipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,560;1,9..144,400&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 7.5 3.5c0 5.4-7.5 10-7.5 10z' fill='%23e0568c'/%3E%3C/svg%3E">
+<style>
+:root{
+  --plum-950:#2a1837; --plum-900:#3d2350; --plum-700:#5b3a78; --plum-500:#7d5a9e;
+  --lilac-500:#9b7bc4; --lilac-300:#c3abdf; --lilac-200:#dccbf0; --lilac-100:#efe7f8;
+  --rose-600:#c94578; --rose-500:#e0568c; --rose-300:#f0a3c2; --rose-100:#fbe4ee; --rose-50:#fdf0f6;
+  --mint-600:#2e8a6d; --mint-100:#e0f3ec;
+  --amber-600:#b07314; --amber-100:#fcefd8;
+  --bg:#fdf6fa; --card:#ffffff; --card-line:#efe7f8; --ink:#3d2350; --ink-dim:#7d5a9e;
+  --chip-ok-bg:#e0f3ec; --chip-ok-fg:#2e8a6d;
+  --serif:"Fraunces",Georgia,serif; --sans:"Nunito Sans",-apple-system,"Segoe UI",sans-serif;
+}
+body.night{
+  --bg:#241a33; --card:#312544; --card-line:#453659; --ink:#efe8fa; --ink-dim:#b3a4cc;
+  --rose-600:#f0a3c2; --lilac-100:#3a2c52; --rose-50:#3f2c46; --rose-100:#4a2f47;
+  --mint-100:#2c4038; --mint-600:#9fdcc4; --amber-100:#4d3a2a; --amber-600:#eec28a;
+  --chip-ok-bg:#2c4038; --chip-ok-fg:#9fdcc4;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* rolagem do documento (não container interno): no Safari do iPhone a área
+   com overflow interno trava o toque e prende a barra de endereço */
+html{background:var(--bg);-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--sans);color:var(--ink);background:var(--bg);
+  max-width:430px;margin:0 auto;min-height:100%;
+  transition:background .3s,color .3s;
+}
+button{font-family:var(--sans);border:none;background:none;color:inherit;cursor:pointer}
+
+.topbar{
+  position:sticky;top:0;z-index:20;background:var(--bg);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:calc(10px + env(safe-area-inset-top)) 18px 8px;
+  transition:background .3s;
+}
+.brand{font-family:var(--serif);font-weight:560;font-size:20px}
+.brand em{font-style:italic;font-weight:400;color:var(--rose-600)}
+.top-actions{display:flex;align-items:center;gap:10px}
+.sync{
+  display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;
+  color:var(--chip-ok-fg);background:var(--chip-ok-bg);padding:3px 9px;border-radius:999px;
+}
+.sync .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.sync.fila{color:var(--amber-600);background:var(--amber-100)}
+.nightbtn{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:var(--card);border:1px solid var(--card-line);color:var(--ink-dim)}
+
+main{padding:4px 18px calc(110px + env(safe-area-inset-bottom))}
+.view{display:none}
+.view.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.hello{margin:8px 0 14px}
+.hello .hi{font-size:12.5px;font-weight:700;color:var(--ink-dim)}
+.hello .who{font-family:var(--serif);font-size:24px;font-weight:560}
+.hello .who em{font-style:italic;font-weight:400;color:var(--rose-600)}
+
+.statecard{
+  border-radius:20px;padding:14px 60px 14px 16px;position:relative;margin-bottom:16px;
+  background:linear-gradient(120deg,var(--rose-50),var(--lilac-100));
+  border:1px solid var(--card-line);
+}
+.statecard .label{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--rose-600);margin-bottom:3px}
+.statecard .big{font-family:var(--serif);font-size:20px;font-weight:560}
+.statecard .sub{font-size:12.5px;color:var(--ink-dim);margin-top:2px}
+.statecard .icon{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  width:42px;height:42px;border-radius:14px;background:var(--card);color:var(--rose-500);
+  display:grid;place-items:center;border:1px solid var(--card-line);
+}
+body.night .statecard .icon{color:var(--rose-300)}
+
+.h4{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);margin:16px 0 8px}
+.rowcard{
+  display:flex;align-items:center;gap:11px;background:var(--card);
+  border:1px solid var(--card-line);border-radius:16px;padding:10px 12px;margin-bottom:8px;
+}
+.rowcard .ric{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;flex:none}
+.ric.warn{background:var(--amber-100);color:var(--amber-600)}
+.ric.cal{background:var(--lilac-100);color:var(--lilac-500)}
+.ric.ok{background:var(--mint-100);color:var(--mint-600)}
+.ric.rose{background:var(--rose-100);color:var(--rose-600)}
+.rowcard .t{font-size:13.5px;font-weight:700;line-height:1.25}
+.rowcard .s{font-size:11.5px;color:var(--ink-dim)}
+.rowcard .end{margin-left:auto;flex:none;text-align:right}
+.badge{font-size:10.5px;font-weight:800;padding:4px 9px;border-radius:999px;white-space:nowrap}
+.badge.warn{background:var(--amber-100);color:var(--amber-600)}
+.badge.soft{background:var(--lilac-100);color:var(--ink-dim)}
+.badge.ok{background:var(--mint-100);color:var(--mint-600)}
+.dim{opacity:.6}
+
+.stats{display:flex;gap:8px;margin-bottom:4px}
+.stat{flex:1;background:var(--card);border:1px solid var(--card-line);border-radius:16px;padding:9px 4px;text-align:center}
+.stat .n{font-family:var(--serif);font-size:19px;font-weight:560}
+.stat .l{font-size:10.5px;font-weight:700;color:var(--ink-dim)}
+
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qbtn{
+  border-radius:20px;padding:15px 12px;display:flex;align-items:center;gap:9px;
+  font-size:13.5px;font-weight:800;white-space:nowrap;transition:transform .1s;
+}
+.qbtn:active{transform:scale(.97)}
+.qbtn .qic{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:rgba(255,255,255,.85);flex:none}
+body.night .qbtn .qic{background:rgba(255,255,255,.08)}
+.qbtn.feed{background:linear-gradient(135deg,#fbdcec,#f7cade);color:#c94578}
+.qbtn.sleep{background:linear-gradient(135deg,#e6dbf7,#d8c8f0);color:#5b3a78}
+.qbtn.diaper{background:linear-gradient(135deg,#dff0fa,#cfe6f6);color:#2e6f96}
+.qbtn.bath{background:linear-gradient(135deg,#e0f3ec,#cfeadf);color:#2e8a6d}
+body.night .qbtn.feed{background:linear-gradient(135deg,#5c3350,#4f2c46);color:#f5b8d3}
+body.night .qbtn.sleep{background:linear-gradient(135deg,#41325e,#392b53);color:#cdb8ef}
+body.night .qbtn.diaper{background:linear-gradient(135deg,#2d4258,#28394d);color:#a3cfe8}
+body.night .qbtn.bath{background:linear-gradient(135deg,#2c4a41,#27403a);color:#9fdcc4}
+.qbtn.wide{grid-column:1/-1;justify-content:center;padding:17px}
+
+.day-h{font-family:var(--serif);font-size:16px;font-weight:560;margin:18px 0 8px}
+
+.seg{display:flex;background:var(--lilac-100);border-radius:14px;padding:4px;margin:6px 0 14px}
+.seg button{flex:1;text-align:center;font-size:12.5px;font-weight:800;padding:8px 0;border-radius:11px;color:var(--ink-dim)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 3px 8px -3px rgba(61,35,80,.2)}
+
+.prog{background:var(--card);border:1px solid var(--card-line);border-radius:18px;padding:13px 15px;margin-bottom:12px}
+.prog .pr-top{display:flex;justify-content:space-between;font-size:12px;font-weight:800;margin-bottom:8px}
+.prog .pr-top b{color:var(--mint-600)}
+.bar{height:8px;border-radius:999px;background:var(--lilac-100);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--mint-600),#5fc39f);transition:width .4s}
+
+.disclaimer{
+  font-size:10.5px;line-height:1.5;color:var(--ink-dim);background:var(--lilac-100);
+  border-radius:12px;padding:8px 11px;margin:10px 0;
+}
+
+.aicard{
+  border-radius:20px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;
+  background:linear-gradient(120deg,var(--lilac-100),var(--rose-50));border:1px solid var(--card-line);
+}
+.aicard .t{font-size:13.5px;font-weight:800}
+.aicard .s{font-size:11.5px;color:var(--ink-dim)}
+.aicard button{
+  margin-left:auto;flex:none;font-size:12px;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,var(--rose-500),var(--plum-500));
+  padding:9px 14px;border-radius:12px;
+}
+.aicard .ai-cta{
+  margin-left:auto;flex:none;font-size:12px;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,var(--rose-500),var(--plum-500));
+  padding:9px 14px;border-radius:12px;
+}
+.ric.esc{background:#dff0fa;color:#2e6f96}
+.badge.esc{background:#dff0fa;color:#2e6f96}
+body.night .ric.esc{background:#2d4258;color:#a3cfe8}
+body.night .badge.esc{background:#2d4258;color:#a3cfe8}
+.rec-txt{
+  width:100%;min-height:120px;border-radius:16px;padding:12px 14px;font-family:var(--sans);
+  font-size:13.5px;line-height:1.55;color:var(--ink);background:var(--card);
+  border:1px solid var(--card-line);resize:vertical;
+}
+.rec-item{
+  background:var(--card);border:1px solid var(--card-line);border-radius:16px;
+  padding:12px 14px;margin-bottom:9px;display:flex;align-items:flex-start;gap:11px;
+}
+.rec-item.off{opacity:.45}
+.rec-item .rc{width:26px;height:26px;border-radius:9px;flex:none;display:grid;place-items:center;
+  background:var(--mint-100);color:var(--mint-600);margin-top:2px}
+.rec-item.off .rc{background:var(--lilac-100);color:var(--lilac-300)}
+.rec-item .t{font-size:13.5px;font-weight:700}
+.rec-item .s{font-size:11.5px;color:var(--ink-dim);margin-top:1px}
+.rec-item .q{font-size:11.5px;font-weight:800;color:#2e6f96;margin-top:3px}
+body.night .rec-item .q{color:#a3cfe8}
+.rec-nota{font-size:11px;line-height:1.5;color:var(--ink-dim);background:var(--lilac-100);
+  border-radius:12px;padding:9px 12px;margin-bottom:12px}
+
+.pcard{background:var(--card);border:1px solid var(--card-line);border-radius:18px;padding:14px 16px;margin-bottom:12px}
+.pcard h5{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:10px}
+.prow{display:flex;align-items:center;gap:11px;padding:7px 0}
+.avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;flex:none;background:var(--rose-100);color:var(--rose-600)}
+.avatar.l{background:var(--lilac-100);color:var(--plum-500)}
+.prow .t{font-size:13.5px;font-weight:700}
+.prow .s{font-size:11.5px;color:var(--ink-dim)}
+.linkbtn{width:100%;text-align:left;font-size:13.5px;font-weight:700;padding:11px 0;border-top:1px solid var(--card-line);display:flex;align-items:center;gap:10px}
+.linkbtn:first-of-type{border-top:none}
+.linkbtn .chev{margin-left:auto;color:var(--ink-dim)}
+.danger{color:var(--rose-600)}
+
+.tabbar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:20;
+  display:flex;justify-content:space-around;align-items:center;
+  padding:9px 8px calc(14px + env(safe-area-inset-bottom));
+  background:var(--card);border-top:1px solid var(--card-line);transition:background .3s;
+}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:800;color:var(--lilac-300);width:64px}
+body.night .tab{color:#6d5b8a}
+.tab.on{color:var(--rose-600)}
+.tab .tic{width:36px;height:26px;border-radius:9px;display:grid;place-items:center}
+.tab.on .tic{background:var(--rose-100)}
+
+.backdrop{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(42,24,55,.45);z-index:30;opacity:0;pointer-events:none;transition:opacity .25s;touch-action:none}
+.backdrop.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:50%;transform:translate(-50%,105%);bottom:0;width:100%;max-width:430px;z-index:40;
+  background:var(--bg);border-radius:26px 26px 0 0;padding:12px 20px calc(26px + env(safe-area-inset-bottom));
+  transition:transform .3s cubic-bezier(.2,.7,.2,1);
+  max-height:80vh;max-height:80dvh; /* dvh: a barra do Safari não corta o botão */
+  overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+}
+.sheet.on{transform:translate(-50%,0)}
+.grab{width:44px;height:5px;border-radius:999px;background:var(--lilac-200);margin:0 auto 14px}
+.sheet h5{font-family:var(--serif);font-size:20px;font-weight:560;margin-bottom:2px}
+.sheet .hint{font-size:12.5px;color:var(--ink-dim);margin-bottom:14px}
+.hint b{color:var(--rose-600);font-weight:800}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{
+  font-size:13px;font-weight:800;padding:10px 15px;border-radius:14px;
+  border:1.5px solid var(--lilac-200);background:var(--card);color:var(--ink-dim);
+}
+.chip.on{border-color:var(--rose-500);background:var(--rose-50);color:var(--rose-600)}
+.sides{display:flex;gap:10px;margin-bottom:14px}
+.side{flex:1;border-radius:18px;padding:13px 10px;text-align:center;border:1.5px solid var(--lilac-200);background:var(--card);position:relative}
+.side .sl{font-size:12px;font-weight:800;color:var(--ink-dim)}
+.side .sv{font-family:var(--serif);font-size:16px;font-weight:560;margin-top:2px}
+.side.on{border-color:var(--rose-500);background:var(--rose-50)}
+.side .tag{
+  position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+  font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  background:var(--rose-500);color:#fff;padding:2px 8px;border-radius:999px;white-space:nowrap;
+}
+.cta{
+  width:100%;border-radius:16px;padding:15px;font-size:15px;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,var(--rose-500),var(--plum-500));
+}
+.cta:disabled{opacity:.5}
+.cta.ghost{background:none;color:var(--ink-dim);font-size:12.5px;padding:10px}
+
+.codebox{
+  font-family:var(--serif);font-size:30px;font-weight:560;letter-spacing:.08em;text-align:center;
+  background:var(--card);border:1.5px dashed var(--lilac-300);border-radius:18px;padding:20px;margin-bottom:14px;
+}
+.resumo-txt{font-size:14px;line-height:1.7;background:var(--card);border:1px solid var(--card-line);border-radius:16px;padding:15px;margin-bottom:14px;white-space:pre-line}
+.spinner{display:flex;flex-direction:column;align-items:center;gap:12px;padding:30px 0;color:var(--ink-dim);font-size:13px;font-weight:700}
+.spinner .ring{width:34px;height:34px;border-radius:50%;border:3px solid var(--lilac-200);border-top-color:var(--rose-500);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.toast{
+  position:fixed;bottom:calc(92px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--plum-950);color:#fff;font-size:13px;font-weight:700;
+  padding:11px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:all .3s;z-index:50;white-space:nowrap;
+}
+body.night .toast{background:var(--rose-100);color:var(--plum-950)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.toast button{margin-left:12px;font-weight:800;color:#f0a3c2}
+body.night .toast button{color:#c94578}
+
+#onb{
+  position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;
+  padding:calc(28px + env(safe-area-inset-top)) 22px calc(28px + env(safe-area-inset-bottom));
+  display:none;flex-direction:column;
+}
+#onb.on{display:flex}
+.onb-marca{font-family:var(--serif);font-weight:560;font-size:20px}
+.onb-marca em{font-style:italic;font-weight:400;color:var(--rose-600)}
+.onb-passo{font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:10px}
+.onb-h{font-family:var(--serif);font-size:25px;font-weight:560;line-height:1.25;margin-bottom:8px}
+.onb-p{font-size:14px;line-height:1.6;color:var(--ink-dim);margin-bottom:22px}
+.onb-corpo{padding:26px 0}
+.onb-campo{
+  width:100%;border-radius:14px;padding:14px 15px;font-family:var(--sans);font-size:15px;
+  color:var(--ink);background:var(--card);border:1px solid var(--card-line);margin-bottom:11px;
+}
+.onb-campo:focus{outline:none;border-color:var(--rose-300)}
+.onb-rot{font-size:12px;font-weight:800;color:var(--ink-dim);margin:2px 0 6px}
+.onb-check{display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--card-line);
+  border-radius:14px;padding:13px 14px;margin-bottom:10px;text-align:left;width:100%}
+.onb-check .bx{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--lilac-300);flex:none;
+  display:grid;place-items:center;margin-top:1px;color:transparent}
+.onb-check.on .bx{background:var(--rose-500);border-color:var(--rose-500);color:#fff}
+.onb-check .tx{font-size:12.5px;line-height:1.55}
+.onb-check .op{font-size:10.5px;font-weight:800;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px}
+.onb-legal{font-size:11.5px;line-height:1.6;color:var(--ink-dim);background:var(--lilac-100);
+  border-radius:14px;padding:13px 15px;margin-bottom:16px}
+.onb-legal b{color:var(--ink)}
+.onb-acoes{margin-top:auto;padding-top:20px}
+.onb-sec{
+  width:100%;border-radius:16px;padding:15px;font-size:15px;font-weight:800;margin-top:10px;
+  background:var(--card);color:var(--ink);border:1.5px solid var(--lilac-300);
+}
+.onb-link{display:block;width:100%;text-align:center;font-size:12.5px;font-weight:800;color:var(--ink-dim);padding:13px}
+.onb-cod{
+  width:100%;border-radius:14px;padding:16px;font-family:var(--serif);font-size:24px;font-weight:560;
+  letter-spacing:.12em;text-align:center;text-transform:uppercase;
+  color:var(--ink);background:var(--card);border:1.5px dashed var(--lilac-300);margin-bottom:11px;
+}
+.notice{
+  display:none;background:var(--plum-950);color:#efe8fa;border-radius:18px;
+  padding:14px 16px;font-size:12.5px;line-height:1.55;margin:6px 0 14px;
+}
+body.night .notice{background:#3a2c50}
+.notice.on{display:block;animation:fade .4s ease}
+.notice b{color:var(--rose-300)}
+.notice .nbtns{display:flex;gap:16px;margin-top:9px}
+.notice button,.notice a{font-size:12px;font-weight:800;color:var(--rose-300);text-decoration:none}
+.notice.warn{background:#4d3a2a;color:#f7e8d2}
+.notice.warn b{color:#eec28a}
+</style>
+</head>
+<body>
+
+<div id="onb"></div>
+
+<header class="topbar">
+  <div class="brand">Mãe<em>Base</em></div>
+  <div class="top-actions">
+    <span class="sync" id="sync"><span class="dot"></span><span id="sync-txt">salvo no aparelho</span></span>
+    <button class="nightbtn" id="btn-night" aria-label="Alternar modo madrugada"></button>
+  </div>
+</header>
+
+<main>
+  <noscript><div class="notice warn on"><b>Esta prévia precisa de JavaScript.</b> Abra o link no Safari ou no Chrome do seu celular.</div></noscript>
+  <div class="notice warn on" id="semjs">
+    <b>Abra esta prévia no navegador.</b> Você parece estar vendo o arquivo numa janela de pré-visualização, que não roda a demonstração.
+    No iPhone: toque em <b>Compartilhar</b> e escolha <b>Safari</b>. Ou peça o link para quem te enviou — é o jeito mais fácil.
+  </div>
+  <div class="notice warn" id="probe"><b>Seus registros não estão sendo salvos neste modo.</b> Abra este link direto no Chrome ou no Safari para a demonstração funcionar por completo.</div>
+  <div class="notice" id="notice">
+    <b>Isto é uma prévia da MãeBase.</b> O que você configurou é fictício, mas mostra como o app vai funcionar de verdade. Tudo fica salvo só neste aparelho; nada é enviado pra internet.
+    <div class="nbtns">
+      <button id="notice-ok">Entendi, vamos lá</button>
+      <a href="https://wa.me/?text=Testei%20a%20pr%C3%A9via%20da%20M%C3%A3eBase!%20O%20que%20eu%20achei%3A%20" target="_blank" rel="noopener">Enviar opinião</a>
+    </div>
+  </div>
+  <section class="view on" id="view-hoje"></section>
+  <section class="view" id="view-historico"></section>
+  <section class="view" id="view-saude"></section>
+  <section class="view" id="view-perfil"></section>
+</main>
+
+<nav class="tabbar" id="tabbar"></nav>
+
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet-mamada"></div>
+<div class="sheet" id="sheet-fralda"></div>
+<div class="sheet" id="sheet-vacina"></div>
+<div class="sheet" id="sheet-resumo"></div>
+<div class="sheet" id="sheet-convite"></div>
+<div class="sheet" id="sheet-sono"></div>
+<div class="sheet" id="sheet-recado"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ ícones (inline, sem dependências) ============ */
+const PATHS={
+  bottle:'<path d="M10 2.5h4V5l1.5 2.2V19a2.5 2.5 0 0 1-2.5 2.5h-2A2.5 2.5 0 0 1 8.5 19V7.2L10 5V2.5z"/><path d="M8.5 12h7"/>',
+  moon:'<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"/>',
+  drop:'<path d="M12 3.5s5.5 6 5.5 10a5.5 5.5 0 1 1-11 0c0-4 5.5-10 5.5-10z"/>',
+  bath:'<path d="M4 12.5h16V15a4.5 4.5 0 0 1-4.5 4.5h-7A4.5 4.5 0 0 1 4 15v-2.5z"/><path d="M6.5 12.5V6a2 2 0 0 1 2-2H10"/>',
+  shield:'<path d="M12 3l7 3v5c0 4.6-3 7.6-7 9-4-1.4-7-4.4-7-9V6l7-3z"/>',
+  shieldx:'<path d="M12 3l7 3v5c0 4.6-3 7.6-7 9-4-1.4-7-4.4-7-9V6l7-3z"/><path d="M12 8.5v4M12 15.5v.5"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/>',
+  home:'<path d="M4 11l8-7 8 7v7.5A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5V11z"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  user:'<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.4 3.8-5 7-5s5.8 1.6 7 5"/>',
+  spark:'<path d="M12 3l1.6 4.9L18.5 9.5l-4.9 1.6L12 16l-1.6-4.9L5.5 9.5l4.9-1.6L12 3z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z"/>',
+  copy:'<rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5v-3a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/>',
+  pill:'<rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-40 12 12)"/><path d="M9 9.5l5.5 5"/>',
+  chev:'<path d="M9 5.5l7 6.5-7 6.5"/>',
+  x:'<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
+  school:'<path d="M6.5 9.5a5.5 5.5 0 0 1 11 0v9a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2v-9z"/><path d="M9.5 9.5V7a2.5 2.5 0 0 1 5 0v2.5"/><path d="M9.5 15h5"/>',
+  heart:'<path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 7.5 3.5c0 5.4-7.5 10-7.5 10z"/>',
+};
+const ico=(n,s=18)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PATHS[n]}</svg>`;
+
+/* ============ estado ============ */
+const KEY='maebase-proto-v2';
+const MIN=60000, HORA=60*MIN, DIA=24*HORA;
+const uid=()=>'e'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+function seed(){
+  const t=Date.now(); const ev=[];
+  const p=(type,minAtras,extra={})=>ev.push(Object.assign({id:uid(),type,ts:t-minAtras*MIN,demo:true},extra));
+  p('feed',160,{modo:'seio',lado:'esquerdo',dur:14,autor:'você'});
+  p('diaper',95,{tipo:'xixi',autor:'Marina'});
+  p('feed',350,{modo:'seio',lado:'direito',dur:18,autor:'você'});
+  p('sleep',430,{dur:95,autor:'você'});
+  p('feed',560,{modo:'mamadeira',ml:90,autor:'Marina'});
+  p('diaper',250,{tipo:'cocô',autor:'você'});
+  p('bath',640,{autor:'você'});
+  p('feed',700,{modo:'seio',lado:'esquerdo',dur:12,autor:'você'});
+  p('diaper',480,{tipo:'xixi e cocô',autor:'você'});
+  for(const d of [1,2]){
+    const b=d*1440;
+    p('feed',b+120,{modo:'seio',lado:'direito',dur:15,autor:'você'});
+    p('feed',b+360,{modo:'seio',lado:'esquerdo',dur:11,autor:d===1?'Marina':'você'});
+    p('feed',b+600,{modo:'mamadeira',ml:100,autor:'Marina'});
+    p('feed',b+840,{modo:'seio',lado:'direito',dur:16,autor:'você'});
+    p('feed',b+1080,{modo:'seio',lado:'esquerdo',dur:13,autor:'você'});
+    p('sleep',b+300,{dur:110,autor:'você'});
+    p('sleep',b+700,{dur:85,autor:'Marina'});
+    p('sleep',b+80,{dur:380,autor:'você'});
+    p('diaper',b+200,{tipo:'xixi',autor:'você'});
+    p('diaper',b+500,{tipo:'cocô',autor:'Marina'});
+    p('diaper',b+900,{tipo:'xixi',autor:'você'});
+    p('bath',b+660,{autor:'você'});
+  }
+  return {
+    v:2, seededAt:t, dormindoDesde:null, night:null, noticeOk:false, recados:[], onbFeito:false,
+    bebeNome:null, bebePronome:null, maeNome:null, souCuidadora:false,
+    events:ev,
+    vacinas:[
+      {id:'bcg',nome:'BCG',dose:'dose única',idade:'ao nascer',aplicada:true},
+      {id:'hepb',nome:'Hepatite B',dose:'ao nascer',idade:'ao nascer',aplicada:true},
+      {id:'penta1',nome:'Pentavalente',dose:'1ª dose',idade:'2 meses',aplicada:true},
+      {id:'vip1',nome:'VIP (poliomielite)',dose:'1ª dose',idade:'2 meses',aplicada:true},
+      {id:'pneumo1',nome:'Pneumocócica 10V',dose:'1ª dose',idade:'2 meses',aplicada:true},
+      {id:'rota1',nome:'Rotavírus',dose:'1ª dose',idade:'2 meses',aplicada:true},
+      {id:'mening1',nome:'Meningocócica C',dose:'1ª dose',idade:'3 meses',aplicada:true},
+      {id:'penta2',nome:'Pentavalente',dose:'2ª dose',idade:'4 meses',aplicada:false,due:t+5*DIA},
+      {id:'vip2',nome:'VIP (poliomielite)',dose:'2ª dose',idade:'4 meses',aplicada:false,due:t+5*DIA},
+      {id:'pneumo2',nome:'Pneumocócica 10V',dose:'2ª dose',idade:'4 meses',aplicada:false,due:t+5*DIA},
+      {id:'rota2',nome:'Rotavírus',dose:'2ª dose',idade:'4 meses',aplicada:false,due:t+5*DIA},
+    ],
+    consultas:[
+      {quando:(function(){const d=new Date(t+DIA);d.setHours(14,0,0,0);return d.getTime()})(),titulo:'Pediatra · Dra. Beatriz',local:'Clínica Bem Nascer'},
+      {quando:t-30*DIA,titulo:'Pediatra · Dra. Beatriz',local:'Consulta dos 2 meses',feita:true},
+    ],
+    remedios:[{id:'vitd',nome:'Vitamina D',dose:'1 gota · manhã',dadoEm:null}],
+  };
+}
+
+let S=null;
+try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
+if(S && S.v===2 && S.events && S.events.length){
+  // helpers de data ainda não existem aqui (definidos abaixo) — comparação local
+  const mesmoDiaQue=(a,b)=>new Date(a).toDateString()===new Date(b).toDateString();
+  const agora=Date.now();
+  const demos=S.events.filter(e=>e.demo).map(e=>e.ts);
+  const ultimoDemo=demos.length?Math.max.apply(null,demos):0;
+  // a demo precisa sempre abrir "hoje": se os eventos fictícios são de outro dia
+  // (virou a meia-noite ou ela voltou dias depois), gera um dia novo
+  const diaVirou=!mesmoDiaQue(ultimoDemo,agora);
+  const sonoVelho=S.dormindoDesde && (agora-S.dormindoDesde>12*HORA || !mesmoDiaQue(S.dormindoDesde,agora));
+  if(diaVirou || sonoVelho){
+    const velho=S; S=seed();
+    S.noticeOk=velho.noticeOk; S.night=velho.night; S.onbFeito=velho.onbFeito;
+    S.bebeNome=velho.bebeNome; S.bebePronome=velho.bebePronome; S.maeNome=velho.maeNome; S.souCuidadora=velho.souCuidadora;
+    // registros feitos pela usuária (sem flag demo) sobrevivem por 7 dias
+    S.events=S.events.concat((velho.events||[]).filter(e=>!e.demo && e.ts>agora-7*DIA));
+    if(velho.dormindoDesde && !sonoVelho) S.dormindoDesde=velho.dormindoDesde;
+  }
+}else{ S=seed(); }
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+// storage bloqueado (QuickLook, content://, aba anônima) → avisar em vez de falhar em silêncio
+let storageOk=true;
+try{localStorage.setItem('__maebase_probe','1');storageOk=localStorage.getItem('__maebase_probe')==='1';localStorage.removeItem('__maebase_probe')}catch(e){storageOk=false}
+
+/* ============ helpers ============ */
+const hoje0=()=>{const d=new Date();d.setHours(0,0,0,0);return d.getTime()};
+const mesmoDia=(a,b)=>{const x=new Date(a),y=new Date(b);return x.toDateString()===y.toDateString()};
+const hm=ts=>new Date(ts).toTimeString().slice(0,5);
+function durTxt(min){min=Math.max(0,Math.round(min));const h=Math.floor(min/60),m=min%60;return h?`${h}h${m?String(m).padStart(2,'0'):''}`:`${m} min`}
+function atras(ts){const m=(Date.now()-ts)/MIN;if(m<2)return'agora mesmo';if(m<60)return`há ${Math.round(m)} min`;return`há ${durTxt(m)}`}
+function diaLabel(ts){
+  const h0=hoje0();
+  if(ts>=h0)return'Hoje';
+  if(ts>=h0-DIA)return'Ontem';
+  return new Date(ts).toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+}
+const evHoje=()=>S.events.filter(e=>e.ts>=hoje0());
+const feeds=list=>list.filter(e=>e.type==='feed');
+function sonoHojeMin(){
+  // sono que atravessou a meia-noite conta só o trecho de hoje
+  let m=evHoje().filter(e=>e.type==='sleep').reduce((a,e)=>a+Math.min(e.dur||0,(e.ts-hoje0())/MIN),0);
+  if(S.dormindoDesde)m+=(Date.now()-Math.max(S.dormindoDesde,hoje0()))/MIN;
+  return m;
+}
+function ultimaMamada(){const f=feeds(S.events).sort((a,b)=>b.ts-a.ts);return f[0]||null}
+function ultimaPorLado(lado){const f=feeds(S.events).filter(e=>e.lado===lado).sort((a,b)=>b.ts-a.ts);return f[0]||null}
+
+/* ============ toast & sync ============ */
+let toastTimer=null;
+function toast(msg,undoFn){
+  const el=document.getElementById('toast');
+  if(undoFn){
+    el.innerHTML='';el.appendChild(document.createTextNode(msg));
+    const b=document.createElement('button');b.textContent='desfazer';
+    b.onclick=()=>{el.classList.remove('on');undoFn()};
+    el.appendChild(b);
+  }else{el.textContent=msg}
+  el.classList.add('on');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('on'),undoFn?5000:2200);
+}
+function desfazEvento(id,msg){
+  S.events=S.events.filter(x=>x.id!==id);save();renderAll();toast(msg||'Registro desfeito');
+}
+function pulseFila(){
+  const s=document.getElementById('sync'),t=document.getElementById('sync-txt');
+  s.classList.add('fila');t.textContent='salvando…';
+  setTimeout(()=>{s.classList.remove('fila');t.textContent='salvo no aparelho'},1400);
+}
+
+/* ============ sheets ============ */
+function openSheet(id){document.getElementById('backdrop').classList.add('on');document.getElementById(id).classList.add('on')}
+function closeSheets(){document.getElementById('backdrop').classList.remove('on');document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('on'))}
+document.getElementById('backdrop').addEventListener('click',closeSheets);
+
+/* ============ registro: mamada ============ */
+function ladoTxt(e){return e.lado==='os dois'?'os dois seios':`seio ${e.lado}`}
+function nomeBebe(){return (S.bebeNome&&S.bebeNome.trim())||'Alice'}
+function nomeMae(){return (S.maeNome&&S.maeNome.trim())||'Juliana'}
+function possessivoBebe(){
+  if(S.bebePronome==='ele')return 'do '+nomeBebe();
+  if(S.bebePronome==='neutro')return 'do bebê';
+  return 'da '+nomeBebe();
+}
+const mamada={modo:'seio',lado:null,inicio:0,dur:10,leite:'leite materno',ml:90};
+function abrirMamada(){
+  const ult=ultimaMamada();
+  let sugerido=null;
+  if(ult&&ult.modo==='seio'){
+    if(ult.lado==='esquerdo')sugerido='direito';
+    else if(ult.lado==='direito')sugerido='esquerdo';
+  }
+  mamada.modo='seio';mamada.lado=sugerido||'os dois';mamada.inicio=0;mamada.dur=10;mamada.leite='leite materno';mamada.ml=90;
+  renderMamada(sugerido);openSheet('sheet-mamada');
+}
+function renderMamada(sugerido){
+  const ult=ultimaMamada();
+  const el=document.getElementById('sheet-mamada');
+  const seio=mamada.modo==='seio';
+  const hint=ult&&ult.modo==='seio'
+    ?(ult.lado==='os dois'?'Última foi nos dois seios':`Última foi no seio ${ult.lado}${sugerido?` — <b>sugerindo o ${sugerido}</b>`:''}`)
+    :'Como foi essa mamada?';
+  el.innerHTML=`
+    <div class="grab"></div>
+    <h5>Registrar mamada</h5>
+    <p class="hint">${hint}</p>
+    <div class="seg">
+      <button class="${seio?'on':''}" data-modo="seio">Seio</button>
+      <button class="${seio?'':'on'}" data-modo="mamadeira">Mamadeira</button>
+    </div>
+    ${seio?`
+    <div class="sides">
+      ${['esquerdo','direito','os dois'].map(l=>{const u=ultimaPorLado(l);return`
+      <button class="side ${mamada.lado===l?'on':''}" data-lado="${l}">
+        ${sugerido===l?'<span class="tag">sugerido</span>':''}
+        <div class="sl">${l==='os dois'?'Os dois':l.charAt(0).toUpperCase()+l.slice(1)}</div><div class="sv">${u?atras(u.ts):'—'}</div>
+      </button>`}).join('')}
+    </div>
+    <p class="hint" style="margin-bottom:8px">Duração</p>
+    <div class="chips">${[5,10,15,20,30,45].map(d=>`<button class="chip ${mamada.dur===d?'on':''}" data-dur="${d}">${d} min</button>`).join('')}<button class="chip ${mamada.dur===null?'on':''}" data-dur="null">não marquei</button></div>
+    `:`
+    <p class="hint" style="margin-bottom:8px">O que tinha na mamadeira</p>
+    <div class="chips">${['leite materno','fórmula'].map(t=>`<button class="chip ${mamada.leite===t?'on':''}" data-leite="${t}">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('')}</div>
+    <p class="hint" style="margin-bottom:8px">Quantidade</p>
+    <div class="chips">${[60,90,120,150].map(m=>`<button class="chip ${mamada.ml===m?'on':''}" data-ml="${m}">${m} ml</button>`).join('')}</div>
+    `}
+    <p class="hint" style="margin-bottom:8px">Quando começou</p>
+    <div class="chips">${[[0,'agora'],[15,'há 15 min'],[30,'há 30 min']].map(([v,l])=>`<button class="chip ${mamada.inicio===v?'on':''}" data-ini="${v}">${l}</button>`).join('')}</div>
+    <button class="cta" id="mamada-ok">Registrar</button>
+    <button class="cta ghost" id="mamada-cancel">cancelar</button>
+  `;
+  el.querySelectorAll('[data-modo]').forEach(b=>b.onclick=()=>{mamada.modo=b.dataset.modo;renderMamada(sugerido)});
+  el.querySelectorAll('[data-lado]').forEach(b=>b.onclick=()=>{mamada.lado=b.dataset.lado;renderMamada(sugerido)});
+  el.querySelectorAll('[data-dur]').forEach(b=>b.onclick=()=>{mamada.dur=b.dataset.dur==='null'?null:+b.dataset.dur;renderMamada(sugerido)});
+  el.querySelectorAll('[data-leite]').forEach(b=>b.onclick=()=>{mamada.leite=b.dataset.leite;renderMamada(sugerido)});
+  el.querySelectorAll('[data-ml]').forEach(b=>b.onclick=()=>{mamada.ml=+b.dataset.ml;renderMamada(sugerido)});
+  el.querySelectorAll('[data-ini]').forEach(b=>b.onclick=()=>{mamada.inicio=+b.dataset.ini;renderMamada(sugerido)});
+  el.querySelector('#mamada-ok').onclick=()=>{
+    const e={id:uid(),type:'feed',ts:Date.now()-mamada.inicio*MIN,modo:mamada.modo,autor:'você'};
+    if(mamada.modo==='seio'){e.lado=mamada.lado;if(mamada.dur!==null)e.dur=mamada.dur}
+    else{e.ml=mamada.ml;e.leite=mamada.leite}
+    S.events.push(e);save();closeSheets();pulseFila();renderAll();
+    toast('Mamada registrada',()=>desfazEvento(e.id));
+  };
+  el.querySelector('#mamada-cancel').onclick=closeSheets;
+}
+
+/* ============ registro: fralda ============ */
+let fraldaTipo='xixi',fraldaAspecto=null;
+function abrirFralda(){
+  fraldaTipo='xixi';fraldaAspecto=null;renderFralda();openSheet('sheet-fralda');
+}
+function renderFralda(){
+  const el=document.getElementById('sheet-fralda');
+  const temCoco=fraldaTipo.includes('cocô');
+  el.innerHTML=`
+    <div class="grab"></div>
+    <h5>Troca de fralda</h5>
+    <p class="hint">O que tinha na fralda?</p>
+    <div class="chips">${['xixi','cocô','xixi e cocô'].map(t=>`<button class="chip ${fraldaTipo===t?'on':''}" data-t="${t}">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('')}</div>
+    ${temCoco?`
+    <p class="hint" style="margin-bottom:8px">Como estava? (opcional)</p>
+    <div class="chips">${['normal','mais líquido','esverdeado'].map(a=>`<button class="chip ${fraldaAspecto===a?'on':''}" data-a="${a}">${a.charAt(0).toUpperCase()+a.slice(1)}</button>`).join('')}</div>
+    `:''}
+    <button class="cta" id="fralda-ok">Registrar</button>
+    <button class="cta ghost" id="fralda-cancel">cancelar</button>
+  `;
+  el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{fraldaTipo=b.dataset.t;if(!fraldaTipo.includes('cocô'))fraldaAspecto=null;renderFralda()});
+  el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{fraldaAspecto=fraldaAspecto===b.dataset.a?null:b.dataset.a;renderFralda()});
+  el.querySelector('#fralda-ok').onclick=()=>{
+    const e={id:uid(),type:'diaper',ts:Date.now(),tipo:fraldaTipo,autor:'você'};
+    if(fraldaAspecto)e.aspecto=fraldaAspecto;
+    S.events.push(e);save();closeSheets();pulseFila();renderAll();
+    toast('Fralda registrada',()=>desfazEvento(e.id));
+  };
+  el.querySelector('#fralda-cancel').onclick=closeSheets;
+}
+
+/* ============ registro: sono e banho ============ */
+function toggleSono(){
+  if(S.dormindoDesde){
+    const inicio=S.dormindoDesde;
+    const dur=Math.min((Date.now()-inicio)/MIN,16*60); // teto de sanidade p/ demo abandonada
+    const e={id:uid(),type:'sleep',ts:Date.now(),dur:Math.round(dur),autor:'você'};
+    S.events.push(e);S.dormindoDesde=null;save();pulseFila();renderAll();
+    toast(`${nomeBebe()} acordou · dormiu ${durTxt(dur)}`,()=>{
+      S.events=S.events.filter(x=>x.id!==e.id);S.dormindoDesde=inicio;save();renderAll();toast(`${nomeBebe()} segue dormindo`);
+    });
+  }else{
+    abrirSono();
+  }
+}
+let sonoInicio=0;
+function abrirSono(){
+  sonoInicio=0;renderSono();openSheet('sheet-sono');
+}
+function renderSono(){
+  const el=document.getElementById('sheet-sono');
+  el.innerHTML=`
+    <div class="grab"></div>
+    <h5>${nomeBebe()} dormiu</h5>
+    <p class="hint">Quando ela pegou no sono?</p>
+    <div class="chips">${[[0,'agora'],[15,'há 15 min'],[30,'há 30 min'],[60,'há 1h']].map(([v,l])=>`<button class="chip ${sonoInicio===v?'on':''}" data-s="${v}">${l}</button>`).join('')}</div>
+    <button class="cta" id="sono-ok">Começar a contar</button>
+    <button class="cta ghost" id="sono-cancel">cancelar</button>
+  `;
+  el.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{sonoInicio=+b.dataset.s;renderSono()});
+  el.querySelector('#sono-ok').onclick=()=>{
+    S.dormindoDesde=Date.now()-sonoInicio*MIN;save();closeSheets();renderAll();
+    toast(`Bons sonhos, ${nomeBebe()}`,()=>{S.dormindoDesde=null;save();renderAll();toast('Sono cancelado')});
+  };
+  el.querySelector('#sono-cancel').onclick=closeSheets;
+}
+function registrarBanho(){
+  const e={id:uid(),type:'bath',ts:Date.now(),autor:'você'};
+  S.events.push(e);save();pulseFila();renderAll();
+  toast('Banho registrado',()=>desfazEvento(e.id));
+}
+
+/* ============ vacinas ============ */
+function abrirVacina(id){
+  const v=S.vacinas.find(x=>x.id===id);if(!v)return;
+  const el=document.getElementById('sheet-vacina');
+  const dias=v.due?Math.max(0,Math.round((v.due-Date.now())/DIA)):null;
+  el.innerHTML=`
+    <div class="grab"></div>
+    <h5>${v.nome} · ${v.dose}</h5>
+    <p class="hint">Prevista para os ${v.idade}${dias!==null?` — <b>${dias===0?'hoje':`em ${dias} dia${dias>1?'s':''}`}</b>`:''}</p>
+    <div class="disclaimer">O calendário segue o PNI e não substitui a orientação do pediatra ${possessivoBebe()}.</div>
+    <button class="cta" id="vac-ok">Marcar como aplicada</button>
+    <button class="cta ghost" id="vac-cancel">ainda não</button>
+  `;
+  el.querySelector('#vac-ok').onclick=()=>{
+    v.aplicada=true;v.aplicadaEm=Date.now();save();closeSheets();pulseFila();renderAll();
+    toast(`${v.nome} ${v.dose} registrada`,()=>{
+      v.aplicada=false;delete v.aplicadaEm;save();renderAll();toast('Registro desfeito');
+    });
+  };
+  el.querySelector('#vac-cancel').onclick=closeSheets;
+  openSheet('sheet-vacina');
+}
+
+/* ============ resumo IA ============ */
+function abrirResumo(){
+  const el=document.getElementById('sheet-resumo');
+  el.innerHTML=`
+    <div class="grab"></div>
+    <h5>Resumo para a consulta</h5>
+    <p class="hint">Gerado a partir dos registros — sem nomes nem dados pessoais</p>
+    <div class="spinner"><div class="ring"></div>organizando os últimos dias…</div>
+  `;
+  openSheet('sheet-resumo');
+  setTimeout(()=>{
+    const dias={};
+    S.events.forEach(e=>{const k=new Date(e.ts).toDateString();(dias[k]=dias[k]||[]).push(e)});
+    const nDias=Math.max(1,Object.keys(dias).length);
+    const nFeeds=feeds(S.events).length;
+    const mediaFeeds=(nFeeds/nDias).toFixed(1).replace('.',',');
+    const sonoTotal=S.events.filter(e=>e.type==='sleep').reduce((a,e)=>a+(e.dur||0),0);
+    const mediaSono=durTxt(sonoTotal/nDias);
+    const nFraldas=S.events.filter(e=>e.type==='diaper').length;
+    const mediaFraldas=(nFraldas/nDias).toFixed(1).replace('.',',');
+    const seioFs=feeds(S.events).filter(e=>e.modo==='seio');
+    const pctSeio=Math.round(100*seioFs.length/Math.max(1,nFeeds));
+    const lados=new Set(seioFs.map(e=>e.lado).filter(Boolean));
+    const ladosTxt=lados.has('os dois')||lados.size>1?', alternando os lados':lados.size===1?`, principalmente no ${[...lados][0]}`:'';
+    const temMamadeira=feeds(S.events).some(e=>e.modo==='mamadeira');
+    const cocos=S.events.filter(e=>e.type==='diaper'&&e.tipo.includes('cocô')).length;
+    const ap=S.vacinas.filter(v=>v.aplicada).length;
+    const pend=S.vacinas.filter(v=>!v.aplicada);
+    const txt=`Bebê de 3 meses — últimos ${nDias} dias.
+
+Alimentação: em média ${mediaFeeds} mamadas por dia (${pctSeio}% no seio${ladosTxt}${temMamadeira?'; o restante em mamadeira':''}).
+
+Sono: média de ${mediaSono} por dia, somando noite e sonecas.
+
+Fraldas: cerca de ${mediaFraldas} trocas por dia${cocos?', com evacuações regulares':' (sem evacuações registradas no período)'}.
+
+Vacinas: ${ap} de ${S.vacinas.length} doses aplicadas.${pend.length?` Próximas: ${pend.map(v=>`${v.nome} (${v.dose})`).join(', ')} — previstas para os 4 meses.`:' Calendário em dia.'}
+
+Uso contínuo: vitamina D, 1 gota ao dia.`;
+    el.innerHTML=`
+      <div class="grab"></div>
+      <h5>Resumo para a consulta</h5>
+      <p class="hint">Gerado a partir dos registros — sem nomes nem dados pessoais</p>
+      <div class="resumo-txt">${txt}</div>
+      <div class="disclaimer">Este resumo organiza seus registros para a conversa com o pediatra — não é orientação médica.</div>
+      <button class="cta" id="resumo-copy">${ico('copy',16)}&nbsp; Copiar texto</button>
+      <button class="cta ghost" id="resumo-close">fechar</button>
+    `;
+    el.querySelector('#resumo-copy').onclick=()=>{
+      const done=()=>toast('Resumo copiado');
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,done)}
+      else{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove();done()}
+    };
+    el.querySelector('#resumo-close').onclick=closeSheets;
+  },1300);
+}
+
+/* ============ convite ============ */
+function abrirConvite(){
+  const el=document.getElementById('sheet-convite');
+  el.innerHTML=`
+    <div class="grab"></div>
+    <h5>Convidar cuidador</h5>
+    <p class="hint">Quem receber este código vê e registra a rotina ${possessivoBebe()} junto com você</p>
+    <div class="codebox">MAEB-4F7K</div>
+    <button class="cta" id="conv-copy">${ico('copy',16)}&nbsp; Copiar código</button>
+    <p class="hint" style="margin-top:12px;text-align:center">Válido por 7 dias · uso único · você pode revogar o acesso quando quiser</p>
+    <p class="hint" style="text-align:center"><b>Nesta prévia o código é só ilustrativo</b> — no app real, quem recebe baixa o app e entra com ele.</p>
+    <button class="cta ghost" id="conv-close">fechar</button>
+  `;
+  el.querySelector('#conv-copy').onclick=()=>{
+    const done=()=>toast('Código copiado — cole no WhatsApp');
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText('MAEB-4F7K').then(done,done)}
+    else done();
+  };
+  el.querySelector('#conv-close').onclick=closeSheets;
+  openSheet('sheet-convite');
+}
+
+/* ============ recados da escola (demo do roadmap v2) ============ */
+const RECADO_EXEMPLO = "Bom dia mam\u00e3es e papais! \ud83c\udf1e Lembrando que sexta \u00e9 o Dia do Brinquedo \u2014 cada crian\u00e7a pode trazer 1 brinquedo de casa (sem pe\u00e7as pequenas, por favor). Tamb\u00e9m precisamos que enviem 1 pacote de len\u00e7o umedecido at\u00e9 quarta. E n\u00e3o esque\u00e7am da reuni\u00e3o de pais no dia 12, \u00e0s 18h30, no sal\u00e3o. Qualquer d\u00favida chamem aqui. Obrigada! \ud83d\udc95";
+
+function proxDiaSemana(dow,h,m){
+  const d=new Date(); d.setHours(h,m||0,0,0);
+  let delta=(dow-d.getDay()+7)%7;
+  if(delta===0 && d.getTime()<Date.now()) delta=7;
+  d.setDate(d.getDate()+delta);
+  return d.getTime();
+}
+function proxDiaMes(dia,h,m){
+  const d=new Date(); d.setHours(h,m||0,0,0); d.setDate(dia);
+  if(d.getTime()<Date.now()) d.setMonth(d.getMonth()+1);
+  return d.getTime();
+}
+function quandoTxt(r){
+  const hora=hm(r.quando).replace(':00','h');
+  const suf=r.temHora?' '+hora:'';
+  if(mesmoDia(r.quando,Date.now()))return 'hoje'+suf;
+  if(mesmoDia(r.quando,Date.now()+DIA))return 'amanh\u00e3'+suf;
+  const dias=Math.round((r.quando-hoje0())/DIA);
+  if(dias>1&&dias<7)return new Date(r.quando).toLocaleDateString('pt-BR',{weekday:'short'}).replace('.','')+suf;
+  return new Date(r.quando).toLocaleDateString('pt-BR',{day:'numeric',month:'short'});
+}
+
+let recadoEtapa='colar', recadoTexto='', recadoEnviado=0, recadoItens=[];
+
+function abrirRecado(){
+  recadoEtapa='colar'; recadoTexto=''; recadoEnviado=0; recadoItens=[];
+  renderRecado(); openSheet('sheet-recado');
+}
+function extrairItens(){
+  return [
+    {id:'r1',titulo:'Dia do Brinquedo',acao:'levar 1 brinquedo (sem pe\u00e7as pequenas)',quando:proxDiaSemana(5,9,0),temHora:false,on:true},
+    {id:'r2',titulo:'Len\u00e7o umedecido',acao:'enviar 1 pacote',quando:proxDiaSemana(3,9,0),temHora:false,on:true},
+    {id:'r3',titulo:'Reuni\u00e3o de pais',acao:'no sal\u00e3o',quando:proxDiaMes(12,18,30),temHora:true,on:true},
+  ];
+}
+function renderRecado(){
+  const el=document.getElementById('sheet-recado');
+  if(recadoEtapa==='colar'){
+    el.innerHTML=`
+      <div class="grab"></div>
+      <h5>Recado da escola</h5>
+      <p class="hint">Cole aqui o recado que chegou no grupo do CMEI</p>
+      <textarea class="rec-txt" id="rec-txt" placeholder="Cole ou digite o recado...">${recadoTexto}</textarea>
+      <button class="cta ghost" id="rec-colar" style="margin:8px 0 4px">${ico('copy',15)}&nbsp; Colar um recado de exemplo</button>
+      <p class="hint" style="margin:10px 0 8px">Quando esse recado foi enviado?</p>
+      <div class="chips">${[[0,'hoje'],[1,'ontem'],[2,'anteontem']].map(([v,l])=>`<button class="chip ${recadoEnviado===v?'on':''}" data-q="${v}">${l}</button>`).join('')}</div>
+      <div class="rec-nota">Perguntamos isso porque palavras como "sexta" e "amanh\u00e3" dependem do dia em que o recado foi escrito \u2014 assim a data sai certa.</div>
+      <button class="cta" id="rec-ok">Organizar recado</button>
+      <button class="cta ghost" id="rec-cancel">cancelar</button>
+    `;
+    const ta=el.querySelector('#rec-txt');
+    ta.oninput=()=>{recadoTexto=ta.value};
+    el.querySelector('#rec-colar').onclick=()=>{recadoTexto=RECADO_EXEMPLO;renderRecado()};
+    el.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{recadoEnviado=+b.dataset.q;renderRecado()});
+    el.querySelector('#rec-cancel').onclick=closeSheets;
+    el.querySelector('#rec-ok').onclick=()=>{
+      if(!recadoTexto.trim()){toast('Cole o recado primeiro');return}
+      recadoItens=extrairItens(); recadoEtapa='revisar'; renderRecado();
+    };
+  }else{
+    const n=recadoItens.filter(i=>i.on).length;
+    el.innerHTML=`
+      <div class="grab"></div>
+      <h5>Encontramos ${recadoItens.length} coisas</h5>
+      <p class="hint">Confira antes de virar lembrete \u2014 toque para tirar o que n\u00e3o for pra voc\u00ea</p>
+      ${recadoItens.map(i=>`
+        <button class="rec-item ${i.on?'':'off'}" style="width:100%;text-align:left" data-i="${i.id}">
+          <span class="rc">${ico(i.on?'check':'x',15)}</span>
+          <span>
+            <span class="t" style="display:block">${i.titulo}</span>
+            <span class="s" style="display:block">${i.acao}</span>
+            <span class="q" style="display:block">${quandoTxt(i)}</span>
+          </span>
+        </button>`).join('')}
+      <div class="rec-nota">Nada vira lembrete sem voc\u00ea confirmar. O texto do recado fica s\u00f3 no seu aparelho.</div>
+      <button class="cta" id="rec-add" ${n?'':'disabled'}>Adicionar ${n} lembrete${n===1?'':'s'}</button>
+      <button class="cta ghost" id="rec-voltar">voltar</button>
+    `;
+    el.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{
+      const it=recadoItens.find(x=>x.id===b.dataset.i); it.on=!it.on; renderRecado();
+    });
+    el.querySelector('#rec-voltar').onclick=()=>{recadoEtapa='colar';renderRecado()};
+    el.querySelector('#rec-add').onclick=()=>{
+      const novos=recadoItens.filter(i=>i.on).map(i=>({id:uid(),titulo:i.titulo,acao:i.acao,quando:i.quando,temHora:i.temHora}));
+      if(!novos.length)return;
+      S.recados=(S.recados||[]).concat(novos); save(); closeSheets(); pulseFila(); renderAll();
+      toast(`${novos.length} lembrete${novos.length===1?'':'s'} da escola`,()=>{
+        const ids=novos.map(x=>x.id); S.recados=S.recados.filter(r=>!ids.includes(r.id));
+        save(); renderAll(); toast('Desfeito');
+      });
+    };
+  }
+}
+
+/* ============ primeiro acesso ============ */
+let onbTela='t0', onbDados={nome:'',email:'',senha:'',nascimento:null,prematuro:false,
+  bebe:'',pronome:null,consentCore:false,consentIA:false,codigo:'',convidada:false};
+
+function onbIr(t){onbTela=t;renderOnb();document.getElementById('onb').scrollTop=0}
+function onbFim(){
+  S.maeNome=(onbDados.nome&&onbDados.nome.trim())||null;
+  S.souCuidadora=!!onbDados.convidada;
+  if(!onbDados.convidada){
+    S.bebeNome=(onbDados.bebe&&onbDados.bebe.trim())||null;
+    S.bebePronome=onbDados.pronome||null;
+  }
+  S.onbFeito=true;save();
+  document.getElementById('onb').classList.remove('on');
+  renderAll();
+  toast(onbDados.convidada?'Tudo pronto \u2014 essa \u00e9 a rotina da Alice':'Pronto! Agora \u00e9 s\u00f3 registrar');
+}
+
+function renderOnb(){
+  const el=document.getElementById('onb');
+  const topo='<div class="onb-marca">M\u00e3e<em>Base</em></div>';
+  const T={};
+
+  T.t0=topo+`<div class="onb-corpo" style="margin:auto 0">
+    <div class="onb-h">O M\u00e3eBase guarda a rotina do seu beb\u00ea, pra voc\u00ea n\u00e3o precisar guardar na cabe\u00e7a.</div>
+    <div class="onb-p">Leva um minuto. D\u00e1 pra parar no meio e voltar depois.</div>
+  </div>
+  <div class="onb-acoes">
+    <button class="cta" data-go="t1">Criar a conta do meu beb\u00ea</button>
+    <button class="onb-sec" data-go="tc">Tenho um c\u00f3digo de convite</button>
+    <button class="onb-link" data-go="t1">J\u00e1 tenho conta</button>
+  </div>`;
+
+  T.tc=topo+`<div class="onb-corpo">
+    <div class="onb-passo">Convite</div>
+    <div class="onb-h">Qual \u00e9 o c\u00f3digo?</div>
+    <div class="onb-p">Quem te convidou recebeu um c\u00f3digo de 8 caracteres. Pode colar aqui.</div>
+    <input class="onb-cod" id="onb-cod" placeholder="MAEB-0000" value="${onbDados.codigo}">
+    <button class="onb-link" id="onb-colar">colar o c\u00f3digo que copiei</button>
+  </div>
+  <div class="onb-acoes">
+    <button class="cta" data-go="t1c">Continuar</button>
+    <button class="onb-link" data-go="t0">voltar</button>
+  </div>`;
+
+  const campos=`
+    <div class="onb-rot">Seu nome</div>
+    <input class="onb-campo" id="onb-nome" value="${onbDados.nome}" placeholder="Como te chamam">
+    <div class="onb-rot">E-mail</div>
+    <input class="onb-campo" id="onb-email" type="email" value="${onbDados.email}" placeholder="voce@email.com">
+    <div class="onb-rot">Senha</div>
+    <input class="onb-campo" id="onb-senha" type="password" value="${onbDados.senha}" placeholder="pelo menos 8 caracteres">`;
+
+  T.t1=topo+`<div class="onb-corpo">
+    <div class="onb-passo">Passo 1 de 4</div>
+    <div class="onb-h">Vamos criar sua conta</div>
+    <div class="onb-p">\u00c9 pra sua rotina n\u00e3o se perder se o celular sumir \u2014 e pra voc\u00ea poder dividir com quem cuida junto.</div>
+    ${campos}
+  </div>
+  <div class="onb-acoes">
+    <button class="cta" data-go="t1b">Criar conta</button>
+    <button class="onb-link" data-go="t0">voltar</button>
+  </div>`;
+
+  T.t1c=topo+`<div class="onb-corpo">
+    <div class="onb-passo">Convite \u00b7 passo 2 de 3</div>
+    <div class="onb-h">Vamos criar sua conta</div>
+    <div class="onb-p">Assim os outros cuidadores veem quem anotou cada coisa.</div>
+    ${campos}
+  </div>
+  <div class="onb-acoes">
+    <button class="cta" data-go="t1bc">Criar conta</button>
+    <button class="onb-link" data-go="tc">voltar</button>
+  </div>`;
+
+  const verif=(prox,volta)=>topo+`<div class="onb-corpo">
+    <div class="onb-passo">Confirma\u00e7\u00e3o</div>
+    <div class="onb-h">Confirme seu e-mail</div>
+    <div class="onb-p">Mandamos um link para <b>${onbDados.email||'seu e-mail'}</b>. Abra e toque nele \u2014 depois volte aqui.<br><br>
+    Isso protege a conta do seu beb\u00ea: sem confirmar, ningu\u00e9m consegue entrar com o seu e-mail.</div>
+    <div class="onb-legal">Nesta pr\u00e9via a confirma\u00e7\u00e3o \u00e9 s\u00f3 ilustrativa \u2014 toque em "j\u00e1 confirmei" para seguir.</div>
+  </div>
+  <div class="onb-acoes">
+    <button class="cta" data-go="${prox}">J\u00e1 confirmei</button>
+    <button class="onb-link" data-go="${volta}">reenviar o link \u00b7 trocar o e-mail</button>
+  </div>`;
+  T.t1b=verif('t2','t1');
+  T.t1bc=verif('t2c','t1c');
+
+  T.t2=topo+`<div class="onb-corpo">
+    <div class="onb-passo">Passo 2 de 4</div>
+    <div class="onb-h">Antes de come\u00e7ar, precisamos do seu OK</div>
+    <div class="onb-p">O M\u00e3eBase guarda informa\u00e7\u00f5es de sa\u00fade do seu beb\u00ea: mamadas, sono, fraldas, banho, vacinas, consultas e rem\u00e9dios. A lei brasileira trata isso como dado sens\u00edvel de uma crian\u00e7a \u2014 e s\u00f3 voc\u00ea, como respons\u00e1vel, pode autorizar.</div>
+    <div class="onb-legal">
+      <b>Os dados s\u00e3o do seu beb\u00ea, e ficam com voc\u00ea.</b> A qualquer momento voc\u00ea baixa tudo ou apaga a conta inteira, no Perfil.<br><br>
+      <b>Guardamos porque \u00e9 o app.</b> Sem registrar mamada, sono e vacina, n\u00e3o existe M\u00e3eBase.<br><br>
+      <b>Quem voc\u00ea convidar v\u00ea tudo.</b> E voc\u00ea pode tirar o acesso quando quiser.<br><br>
+      <b>N\u00e3o vendemos nem trocamos seus dados.</b> Nunca, com ningu\u00e9m, para publicidade.<br><br>
+      <b>N\u00e3o somos m\u00e9dicos.</b> O M\u00e3eBase organiza a informa\u00e7\u00e3o. N\u00e3o d\u00e1 diagn\u00f3stico e n\u00e3o substitui o pediatra.
+    </div>
+    <button class="onb-check ${onbDados.consentCore?'on':''}" data-ck="core">
+      <span class="bx">${ico('check',14)}</span>
+      <span class="tx">Sou m\u00e3e, pai ou respons\u00e1vel legal do beb\u00ea que vou cadastrar, tenho 18 anos ou mais, e autorizo o M\u00e3eBase a guardar e usar essas informa\u00e7\u00f5es de sa\u00fade para me ajudar a cuidar dele. Li e aceito o Termo de Uso (v1.0) e a Pol\u00edtica de Privacidade (v1.0).</span>
+    </button>
+    <button class="onb-check ${onbDados.consentIA?'on':''}" data-ck="ia">
+      <span class="bx">${ico('check',14)}</span>
+      <span class="tx"><span class="op">opcional \u00b7 voc\u00ea pode mudar depois</span>Quero o resumo para a consulta, gerado por intelig\u00eancia artificial a partir dos meus registros \u2014 sempre sem nome e sem dados que identifiquem o beb\u00ea.</span>
+    </button>
+  </div>
+  <div class="onb-acoes">
+    <button class="cta" data-go="t3" ${onbDados.consentCore?'':'disabled'}>Continuar</button>
+    <button class="onb-link" data-go="t1b">voltar</button>
+  </div>`;
+
+  T.t2c=topo+`<div class="onb-corpo">
+    <div class="onb-passo">Convite \u00b7 passo 3 de 3</div>
+    <div class="onb-h">Juliana convidou voc\u00ea para cuidar da Alice</div>
+    <div class="onb-p">Aceitando, voc\u00ea passa a ver e registrar tudo: mamadas, sono, fraldas, banho, vacinas, consultas e rem\u00e9dios da Alice.</div>
+    <div class="onb-legal">
+      <b>Essas informa\u00e7\u00f5es n\u00e3o s\u00e3o suas.</b> S\u00e3o dados de sa\u00fade de uma crian\u00e7a. Quem autorizou seu acesso foi a Juliana, e ela pode tirar esse acesso a qualquer momento.<br><br>
+      <b>O que voc\u00ea registrar aparece com o seu nome.</b> Os outros cuidadores veem quem anotou cada coisa.
+    </div>
+    <button class="onb-check ${onbDados.consentCore?'on':''}" data-ck="core">
+      <span class="bx">${ico('check',14)}</span>
+      <span class="tx">Combinado. Vou usar essas informa\u00e7\u00f5es s\u00f3 para cuidar da Alice e n\u00e3o vou repassar para ningu\u00e9m fora do app. Li e aceito o Termo de Uso (v1.0) e a Pol\u00edtica de Privacidade (v1.0).</span>
+    </button>
+  </div>
+  <div class="onb-acoes">
+    <button class="cta" id="onb-aceitar" ${onbDados.consentCore?'':'disabled'}>Aceitar e entrar</button>
+    <button class="onb-link" data-go="t0">recusar</button>
+  </div>`;
+
+  const nasc=onbDados.nascimento;
+  T.t3=topo+`<div class="onb-corpo">
+    <div class="onb-passo">Passo 3 de 4</div>
+    <div class="onb-h">Quando o beb\u00ea nasceu?</div>
+    <div class="onb-p">\u00c9 com essa data que eu monto o calend\u00e1rio de vacinas.</div>
+    <div class="chips">
+      <button class="chip ${nasc===0?'on':''}" data-nasc="0">Hoje</button>
+      <button class="chip ${nasc===1?'on':''}" data-nasc="1">Ontem</button>
+      <button class="chip ${nasc===98?'on':''}" data-nasc="98">Outra data</button>
+    </div>
+    ${nasc===98?'<div class="onb-legal">Nesta pr\u00e9via usamos <b>12 de maio</b> como exemplo \u2014 assim seu beb\u00ea aparece com 3 meses na demonstra\u00e7\u00e3o.</div>':''}
+    <button class="onb-check ${onbDados.prematuro?'on':''}" data-ck="prem" style="margin-top:14px">
+      <span class="bx">${ico('check',14)}</span>
+      <span class="tx">Nasceu prematuro (antes de 37 semanas) ou com menos de 2 kg</span>
+    </button>
+    ${onbDados.prematuro?'<div class="onb-legal" style="margin-top:10px">Combinado. O calend\u00e1rio de vacinas de prematuro \u00e9 diferente \u2014 eu n\u00e3o vou chutar nada e vou pedir pra voc\u00ea conferir com o pediatra.</div>':''}
+  </div>
+  <div class="onb-acoes">
+    <button class="cta" data-go="t4" ${nasc===null?'disabled':''}>Continuar</button>
+    <button class="onb-link" data-go="t2">voltar</button>
+  </div>`;
+
+  const ela=onbDados.pronome==='ela';
+  T.t4=topo+`<div class="onb-corpo">
+    <div class="onb-passo">Passo 4 de 4</div>
+    <div class="onb-h">Como voc\u00eas chamam ${ela?'ela':'ele'}?</div>
+    <div class="onb-p">Pode ser apelido. \u00c9 assim que eu vou falar ${ela?'dela':'dele'} aqui dentro.</div>
+    <input class="onb-campo" id="onb-bebe" value="${onbDados.bebe}" placeholder="Nome ou apelido">
+    <div class="onb-rot" style="margin-top:14px">E como eu falo?</div>
+    <div class="chips">
+      ${[['ele','ele'],['ela','ela'],['neutro','s\u00f3 &quot;o beb\u00ea&quot;']].map(function(x){
+        return '<button class="chip '+(onbDados.pronome===x[0]?'on':'')+'" data-pro="'+x[0]+'">'+x[1]+'</button>';
+      }).join('')}
+    </div>
+  </div>
+  <div class="onb-acoes">
+    <button class="cta" id="onb-fim">Continuar</button>
+    <button class="onb-link" id="onb-pular">depois eu coloco</button>
+  </div>`;
+
+  el.innerHTML=T[onbTela]||T.t0;
+
+  el.querySelectorAll('[data-go]').forEach(function(b){b.onclick=function(){
+    if(b.disabled)return;
+    ['nome','email','senha'].forEach(function(k){var c=el.querySelector('#onb-'+k);if(c)onbDados[k]=c.value});
+    var cod=el.querySelector('#onb-cod'); if(cod)onbDados.codigo=cod.value;
+    var id=b.dataset.go;
+    if(id==='t1c'||id==='t1bc'||id==='t2c')onbDados.convidada=true;
+    onbIr(id);
+  }});
+  el.querySelectorAll('[data-ck]').forEach(function(b){b.onclick=function(){
+    var k=b.dataset.ck;
+    if(k==='core')onbDados.consentCore=!onbDados.consentCore;
+    if(k==='ia')onbDados.consentIA=!onbDados.consentIA;
+    if(k==='prem')onbDados.prematuro=!onbDados.prematuro;
+    renderOnb();
+  }});
+  el.querySelectorAll('[data-nasc]').forEach(function(b){b.onclick=function(){onbDados.nascimento=+b.dataset.nasc;renderOnb()}});
+  el.querySelectorAll('[data-pro]').forEach(function(b){b.onclick=function(){
+    var c=el.querySelector('#onb-bebe'); if(c)onbDados.bebe=c.value; // senao o re-render abaixo descarta o nome digitado
+    onbDados.pronome=b.dataset.pro;renderOnb();
+  }});
+  var colar=el.querySelector('#onb-colar');
+  if(colar)colar.onclick=function(){onbDados.codigo='MAEB-4F7K';renderOnb();toast('C\u00f3digo colado')};
+  var aceitar=el.querySelector('#onb-aceitar');
+  if(aceitar)aceitar.onclick=function(){if(!aceitar.disabled)onbFim()};
+  var fim=el.querySelector('#onb-fim');
+  if(fim)fim.onclick=function(){var c=el.querySelector('#onb-bebe');if(c)onbDados.bebe=c.value;onbFim()};
+  var pular=el.querySelector('#onb-pular');
+  if(pular)pular.onclick=onbFim;
+}
+function abrirOnb(){
+  onbTela='t0';
+  onbDados={nome:'',email:'',senha:'',nascimento:null,prematuro:false,bebe:'',pronome:null,
+    consentCore:false,consentIA:false,codigo:'',convidada:false};
+  document.getElementById('onb').classList.add('on');
+  renderOnb();
+}
+
+/* ============ views ============ */
+function renderHoje(){
+  const h=new Date().getHours();
+  const sauda=S.dormindoDesde&&(h>=21||h<6)?'Madrugada tranquila':h<6?'Boa madrugada':h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
+  const ehoje=evHoje();
+  let agora;
+  if(S.dormindoDesde){
+    agora={label:'Agora',big:`Dormindo ${atras(S.dormindoDesde).replace('há','há')}`.replace('agora mesmo','agora'),sub:`desde ${hm(S.dormindoDesde)} · registrado por você`,icon:'moon'};
+  }else{
+    const ult=[...S.events].sort((a,b)=>b.ts-a.ts)[0];
+    if(ult&&ult.type==='feed')agora={label:'Agora',big:`Mamou ${atras(ult.ts)}`,sub:ult.modo==='seio'?`${ladoTxt(ult)}${ult.dur?` · ${ult.dur} min`:''} · por ${ult.autor}`:`mamadeira (${ult.leite||'leite materno'}) · ${ult.ml} ml · por ${ult.autor}`,icon:'bottle'};
+    else if(ult&&ult.type==='sleep')agora={label:'Agora',big:`Acordou ${atras(ult.ts)}`,sub:`dormiu ${durTxt(ult.dur)} · por ${ult.autor}`,icon:'sun'};
+    else if(ult&&ult.type==='diaper')agora={label:'Agora',big:`Fralda trocada ${atras(ult.ts)}`,sub:`${ult.tipo} · por ${ult.autor}`,icon:'drop'};
+    else agora={label:'Agora',big:`Banho ${atras(ult.ts)}`,sub:`por ${ult.autor}`,icon:'bath'};
+  }
+  const pend=S.vacinas.filter(v=>!v.aplicada);
+  const diasVac=pend.length?Math.max(0,Math.round((pend[0].due-Date.now())/DIA)):null;
+  const consulta=S.consultas.find(c=>!c.feita&&c.quando>Date.now());
+  let consultaTxt=null;
+  if(consulta){
+    const hora=hm(consulta.quando).replace(':00','h');
+    if(mesmoDia(consulta.quando,Date.now()))consultaTxt=`hoje ${hora}`;
+    else if(mesmoDia(consulta.quando,Date.now()+DIA))consultaTxt=`amanhã ${hora}`;
+    else consultaTxt=new Date(consulta.quando).toLocaleDateString('pt-BR',{day:'numeric',month:'short'});
+  }
+  const nF=feeds(ehoje).length, nD=ehoje.filter(e=>e.type==='diaper').length, nB=ehoje.filter(e=>e.type==='bath').length;
+  document.getElementById('view-hoje').innerHTML=`
+    <div class="hello"><div class="hi">${sauda}, ${nomeMae()}</div><div class="who">${nomeBebe()} · <em>3 meses</em></div></div>
+    <div class="statecard">
+      <div class="label">${agora.label}</div><div class="big">${agora.big}</div><div class="sub">${agora.sub}</div>
+      <div class="icon">${ico(agora.icon,22)}</div>
+    </div>
+    <div class="h4">Próximos</div>
+    ${pend.length?`<button class="rowcard" style="width:100%;text-align:left" onclick="abrirVacina('${pend[0].id}')">
+      <div class="ric warn">${ico('shield')}</div>
+      <div><div class="t">${pend[0].nome} · ${pend[0].dose}</div><div class="s">calendário PNI · ${pend.length>1?`+${pend.length-1} doses na mesma data`:'dose única'}</div></div>
+      <div class="end"><span class="badge warn">${diasVac===0?'hoje':`em ${diasVac} dia${diasVac>1?'s':''}`}</span></div>
+    </button>`:''}
+    ${consulta?`<div class="rowcard">
+      <div class="ric cal">${ico('cal')}</div>
+      <div><div class="t">${consulta.titulo}</div><div class="s">${consulta.local}</div></div>
+      <div class="end"><span class="badge soft">${consultaTxt}</span></div>
+    </div>`:''}
+    ${(S.recados||[]).slice().sort((a,b)=>a.quando-b.quando).map(r=>`<div class="rowcard">
+      <div class="ric esc">${ico('school')}</div>
+      <div><div class="t">${r.titulo}</div><div class="s">${r.acao} · CMEI</div></div>
+      <div class="end"><span class="badge esc">${quandoTxt(r)}</span></div>
+    </div>`).join('')}
+    <button class="aicard" style="width:100%;text-align:left;margin-top:14px" onclick="abrirRecado()">
+      <div>${ico('school',22)}</div>
+      <div><div class="t">Recado da escola</div><div class="s">cole e vire lembrete organizado</div></div>
+      <span class="ai-cta">Colar</span>
+    </button>
+    <div class="h4">Hoje até agora</div>
+    <div class="stats">
+      <div class="stat"><div class="n">${nF}</div><div class="l">mamadas</div></div>
+      <div class="stat"><div class="n">${durTxt(sonoHojeMin())}</div><div class="l">sono</div></div>
+      <div class="stat"><div class="n">${nD}</div><div class="l">fraldas</div></div>
+      <div class="stat"><div class="n">${nB}</div><div class="l">banho</div></div>
+    </div>
+    <div class="h4">Registrar</div>
+    <div class="quick">
+      ${S.dormindoDesde?`<button class="qbtn sleep wide" onclick="toggleSono()"><span class="qic">${ico('sun',19)}</span>${nomeBebe()} acordou</button>`:''}
+      <button class="qbtn feed" onclick="abrirMamada()"><span class="qic">${ico('bottle',19)}</span>Mamada</button>
+      ${S.dormindoDesde?'':`<button class="qbtn sleep" onclick="toggleSono()"><span class="qic">${ico('moon',19)}</span>${nomeBebe()} dormiu</button>`}
+      <button class="qbtn diaper" onclick="abrirFralda()"><span class="qic">${ico('drop',19)}</span>Fralda</button>
+      <button class="qbtn bath" onclick="registrarBanho()"><span class="qic">${ico('bath',19)}</span>Banho</button>
+    </div>
+  `;
+}
+
+function renderHistorico(){
+  const grupos={};
+  [...S.events].sort((a,b)=>b.ts-a.ts).forEach(e=>{const k=diaLabel(e.ts);(grupos[k]=grupos[k]||[]).push(e)});
+  const rot={feed:e=>e.modo==='seio'?`Mamada · ${ladoTxt(e)}${e.dur?` · ${e.dur} min`:''}`:`Mamada · mamadeira (${e.leite||'leite materno'}) · ${e.ml} ml`,
+             sleep:e=>`Sono · ${durTxt(e.dur)}`,diaper:e=>`Fralda · ${e.tipo}${e.aspecto?` (${e.aspecto})`:''}`,bath:()=>'Banho'};
+  const cls={feed:'rose',sleep:'cal',diaper:'ok',bath:'ok'};
+  const icn={feed:'bottle',sleep:'moon',diaper:'drop',bath:'bath'};
+  document.getElementById('view-historico').innerHTML=`
+    <div class="hello"><div class="hi">Tudo que foi registrado</div><div class="who">Histórico</div></div>
+    ${Object.entries(grupos).map(([dia,evs])=>`
+      <div class="day-h">${dia}</div>
+      ${evs.map(e=>`<div class="rowcard">
+        <div class="ric ${cls[e.type]}">${ico(icn[e.type])}</div>
+        <div><div class="t">${rot[e.type](e)}</div><div class="s">por ${e.autor}</div></div>
+        <div class="end"><span class="s" style="font-size:11.5px;color:var(--ink-dim)">${hm(e.ts)}</span></div>
+      </div>`).join('')}
+    `).join('')}
+  `;
+}
+
+let abaSaude='vacinas';
+function renderSaude(){
+  const ap=S.vacinas.filter(v=>v.aplicada).length;
+  const pend=S.vacinas.filter(v=>!v.aplicada);
+  const hojeStr=new Date().toDateString();
+  const remedioDado=r=>r.dadoEm&&new Date(r.dadoEm).toDateString()===hojeStr;
+  let corpo='';
+  if(abaSaude==='vacinas'){
+    corpo=`
+      <div class="prog"><div class="pr-top"><span>Calendário vacinal</span><b>${ap} de ${S.vacinas.length} aplicadas</b></div>
+      <div class="bar"><i style="width:${Math.round(100*ap/S.vacinas.length)}%"></i></div></div>
+      ${pend.map(v=>{const d=Math.max(0,Math.round((v.due-Date.now())/DIA));return`
+        <button class="rowcard" style="width:100%;text-align:left;border:1.5px solid var(--rose-300);background:var(--rose-50)" onclick="abrirVacina('${v.id}')">
+          <div class="ric rose">${ico('shieldx')}</div>
+          <div><div class="t">${v.nome} · ${v.dose}</div><div class="s">${v.idade}</div></div>
+          <div class="end"><span class="badge warn">${d===0?'hoje':`em ${d} dia${d>1?'s':''}`}</span></div>
+        </button>`}).join('')}
+      ${S.vacinas.filter(v=>v.aplicada).map(v=>`
+        <div class="rowcard dim">
+          <div class="ric ok">${ico('check')}</div>
+          <div><div class="t">${v.nome} · ${v.dose}</div><div class="s">${v.aplicadaEm?'aplicada · registrada por você':'aplicada · '+v.idade}</div></div>
+        </div>`).join('')}
+      <div class="disclaimer">O calendário segue o PNI e não substitui a orientação do pediatra ${possessivoBebe()}.</div>
+    `;
+  }else if(abaSaude==='consultas'){
+    corpo=S.consultas.sort((a,b)=>b.quando-a.quando).map(c=>`
+      <div class="rowcard ${c.feita?'dim':''}">
+        <div class="ric ${c.feita?'ok':'cal'}">${ico(c.feita?'check':'cal')}</div>
+        <div><div class="t">${c.titulo}</div><div class="s">${c.local}</div></div>
+        <div class="end"><span class="badge ${c.feita?'ok':'soft'}">${c.feita?'realizada':new Date(c.quando).toLocaleDateString('pt-BR',{day:'numeric',month:'short'})+' · '+hm(c.quando).replace(':00','h')}</span></div>
+      </div>`).join('');
+  }else{
+    corpo=S.remedios.map(r=>`
+      <div class="rowcard">
+        <div class="ric cal">${ico('pill')}</div>
+        <div><div class="t">${r.nome}</div><div class="s">${r.dose}</div></div>
+        <div class="end"><button class="badge ${remedioDado(r)?'ok':'soft'}" onclick="marcarRemedio('${r.id}')">${remedioDado(r)?'dado hoje ✓':'marcar dado'}</button></div>
+      </div>`).join('')+
+      `<div class="disclaimer">Lembretes de medicamento chegam como notificação no app real — aqui é só demonstração.</div>`;
+  }
+  document.getElementById('view-saude').innerHTML=`
+    <div class="hello"><div class="hi">Saúde ${possessivoBebe()}</div><div class="who">Cuidados · <em>PNI</em></div></div>
+    <div class="aicard">
+      <div>${ico('spark',22)}</div>
+      <div><div class="t">Resumo para a consulta</div><div class="s">seus registros, prontos para o pediatra</div></div>
+      <button onclick="abrirResumo()">Gerar</button>
+    </div>
+    <div class="seg">
+      <button class="${abaSaude==='vacinas'?'on':''}" onclick="setAbaSaude('vacinas')">Vacinas</button>
+      <button class="${abaSaude==='consultas'?'on':''}" onclick="setAbaSaude('consultas')">Consultas</button>
+      <button class="${abaSaude==='remedios'?'on':''}" onclick="setAbaSaude('remedios')">Remédios</button>
+    </div>
+    ${corpo}
+  `;
+}
+function setAbaSaude(a){abaSaude=a;renderSaude()}
+function marcarRemedio(id){
+  const r=S.remedios.find(x=>x.id===id);if(!r)return;
+  const hojeStr=new Date().toDateString();
+  const dado=r.dadoEm&&new Date(r.dadoEm).toDateString()===hojeStr;
+  r.dadoEm=dado?null:Date.now();save();toast(dado?'Desmarcado':'Vitamina D marcada como dada');renderSaude();
+}
+
+function renderPerfil(){
+  const nasc=new Date(Date.now()-98*DIA).toLocaleDateString('pt-BR',{day:'numeric',month:'long'});
+  const inicial=nome=>(nome||'?').trim().charAt(0).toUpperCase()||'?';
+  // lista de cuidadores reflete o caminho do onboarding: quem criou o perfil é a dona;
+  // quem entrou por código de convite aparece como cuidador(a) adicional, com o nome que digitou
+  const cuidadores=S.souCuidadora
+    ? [
+        {nome:'Juliana',papel:'dona do perfil',eu:false}, // persona fixa: quem te convidou
+        {nome:'Marina',papel:'cuidadora · avó',eu:false},
+        {nome:nomeMae(),papel:'cuidador(a)',eu:true},
+      ]
+    : [
+        {nome:nomeMae(),papel:'dona do perfil',eu:true},
+        {nome:'Marina',papel:'cuidadora · avó',eu:false},
+      ];
+  document.getElementById('view-perfil').innerHTML=`
+    <div class="hello"><div class="hi">Perfil e configurações</div><div class="who">${nomeBebe()}</div></div>
+    <div class="pcard">
+      <div class="prow"><div class="avatar">${inicial(nomeBebe())}</div><div><div class="t">${nomeBebe()}</div><div class="s">nascida em ${nasc} · 3 meses</div></div></div>
+    </div>
+    <div class="pcard">
+      <h5>Cuidadores</h5>
+      ${cuidadores.map(c=>`<div class="prow"><div class="avatar${c.eu?'':' l'}">${inicial(c.nome)}</div><div><div class="t">${c.nome}${c.eu?' (você)':''}</div><div class="s">${c.papel}</div></div></div>`).join('')}
+      <button class="linkbtn" onclick="abrirConvite()" style="border-top:1px solid var(--card-line);margin-top:6px">${ico('user',17)} Convidar cuidador <span class="chev">${ico('chev',15)}</span></button>
+    </div>
+    <div class="pcard">
+      <h5>Preferências</h5>
+      <button class="linkbtn" onclick="toggleNight()">${ico('moon',17)} Modo madrugada <span class="chev" style="font-size:12px;font-weight:800">${S.night===null?'automático':S.night?'ligado':'desligado'}</span></button>
+    </div>
+    <div class="pcard">
+      <h5>Sobre este protótipo</h5>
+      <p style="font-size:12.5px;line-height:1.6;color:var(--ink-dim)">
+        Você está usando uma demonstração da MãeBase com dados fictícios. Nada é enviado a nenhum servidor —
+        os registros ficam apenas neste navegador. O app real terá conta segura, sincronização entre cuidadores
+        e lembretes por notificação. Sua opinião agora é o que define o que construímos primeiro. 💜
+      </p>
+      <a class="linkbtn" style="border-top:1px solid var(--card-line);margin-top:8px;color:inherit" href="https://wa.me/?text=Testei%20a%20pr%C3%A9via%20da%20M%C3%A3eBase!%20O%20que%20eu%20achei%3A%20" target="_blank" rel="noopener">${ico('heart',17)} Enviar minha opinião no WhatsApp <span class="chev">${ico('chev',15)}</span></a>
+      <button class="linkbtn danger" onclick="resetDemo()">Reiniciar demonstração</button>
+    </div>
+  `;
+}
+function resetDemo(){
+  if(confirm('Apagar os registros desta demonstração e recomeçar?')){
+    try{localStorage.removeItem(KEY)}catch(e){}
+    location.reload();
+  }
+}
+
+/* ============ tabs & night ============ */
+const TABS=[['hoje','home','Hoje'],['historico','clock','Histórico'],['saude','shield','Saúde'],['perfil','user','Perfil']];
+let tabAtiva='hoje';
+function renderTabs(){
+  document.getElementById('tabbar').innerHTML=TABS.map(([id,icn,l])=>
+    `<button class="tab ${tabAtiva===id?'on':''}" onclick="setTab('${id}')"><span class="tic">${ico(icn,19)}</span>${l}</button>`).join('');
+}
+function setTab(id){
+  tabAtiva=id;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.getElementById('view-'+id).classList.add('on');
+  renderTabs();renderAll(false);
+  document.querySelector('main').scrollTo({top:0});
+}
+function aplicarNight(){
+  const h=new Date().getHours();
+  const auto=(h>=21||h<6);
+  const on=S.night===null?auto:S.night;
+  document.body.classList.toggle('night',on);
+  document.getElementById('btn-night').innerHTML=ico(on?'sun':'moon',17);
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta)meta.setAttribute('content',on?'#241a33':'#fdf6fa');
+}
+function toggleNight(){
+  // ciclo: automático → ligado → desligado → automático
+  S.night=S.night===null?true:S.night===true?false:null;
+  save();aplicarNight();renderPerfil();
+}
+document.getElementById('btn-night').addEventListener('click',toggleNight);
+
+/* ============ boot ============ */
+function renderAll(){
+  renderHoje();renderHistorico();renderSaude();renderPerfil();
+}
+document.getElementById('semjs').classList.remove('on'); // JS rodou: esconde o aviso de pré-visualização
+if('scrollRestoration' in history)history.scrollRestoration='manual'; // sempre abrir no topo
+renderTabs();aplicarNight();renderAll();
+if(!S.onbFeito)abrirOnb();
+if(!storageOk)document.getElementById('probe').classList.add('on');
+if(!S.noticeOk){
+  document.getElementById('notice').classList.add('on');
+  document.getElementById('notice-ok').onclick=()=>{
+    S.noticeOk=true;save();document.getElementById('notice').classList.remove('on');
+  };
+}
+setInterval(()=>{
+  if(S.night===null)aplicarNight(); // cruzou 21h/6h com o app aberto
+  if(tabAtiva==='hoje')renderHoje();
+},30000);
+</script>
+</body>
+</html>
