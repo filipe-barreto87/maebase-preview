@@ -352,6 +352,7 @@ body.night .notice{background:#3a2c50}
 <div class="sheet" id="sheet-convite"></div>
 <div class="sheet" id="sheet-sono"></div>
 <div class="sheet" id="sheet-recado"></div>
+<div class="sheet" id="sheet-remedio"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -857,7 +858,7 @@ function renderRecado(){
 
 /* ============ primeiro acesso ============ */
 let onbTela='t0', onbDados={nome:'',email:'',senha:'',nascimento:null,prematuro:false,
-  bebe:'',pronome:null,consentCore:false,consentIA:false,codigo:'',convidada:false};
+  bebe:'',pronome:null,consentCore:false,consentIA:false,codigo:'',convidada:false,remedios:[]};
 
 function onbIr(t){onbTela=t;renderOnb();document.getElementById('onb').scrollTop=0}
 function onbFim(){
@@ -866,6 +867,13 @@ function onbFim(){
   if(!onbDados.convidada){
     S.bebeNome=(onbDados.bebe&&onbDados.bebe.trim())||null;
     S.bebePronome=onbDados.pronome||null;
+    // o que ela informou no primeiro acesso substitui o exemplo semeado;
+    // quem pula continua vendo a Vitamina D de demonstracao
+    if(onbDados.remedios.length){
+      S.remedios=onbDados.remedios.map(function(r,i){
+        return {id:'med'+(Date.now()+i),nome:r.nome,dose:r.dose,dadoEm:null};
+      });
+    }
   }
   S.onbFeito=true;save();
   document.getElementById('onb').classList.remove('on');
@@ -1023,15 +1031,34 @@ function renderOnb(){
     </div>
   </div>
   <div class="onb-acoes">
-    <button class="cta" id="onb-fim">Continuar</button>
+    <button class="cta" data-go="t5">Continuar</button>
     <button class="onb-link" id="onb-pular">depois eu coloco</button>
+  </div>`;
+
+  T.t5=topo+`<div class="onb-corpo">
+    <div class="onb-passo">Último passo</div>
+    <div class="onb-h">${nomeBebeOnb()} toma algum medicamento ou vitamina hoje?</div>
+    <div class="onb-p">Vitamina D, ferro, probiótico, algo receitado. Se não toma nada, é só pular.</div>
+    ${onbDados.remedios.length?'<div style="margin:14px 0 2px">'+onbDados.remedios.map(function(r,i){
+      return '<div class="rowcard"><div class="ric cal">'+ico('pill')+'</div>'+
+        '<div><div class="t">'+r.nome+'</div><div class="s">'+r.dose+'</div></div>'+
+        '<div class="end"><button class="badge soft" data-medrm="'+i+'" style="padding:4px 9px">×</button></div></div>';
+    }).join('')+'</div>':''}
+    <input class="onb-campo" id="onb-med-nome" placeholder="Nome do medicamento" autocomplete="off" style="margin-top:14px">
+    <input class="onb-campo" id="onb-med-dose" placeholder="Dose e horário (ex.: 1 gota · manhã)" autocomplete="off" style="margin-top:8px">
+    <button class="onb-sec" id="onb-med-add" style="margin-top:10px">+ Adicionar à lista</button>
+    <div class="onb-legal" style="margin-top:12px">A dose é sempre a que o pediatra indicou. O MãeBase só lembra do horário — não recomenda medicamento.</div>
+  </div>
+  <div class="onb-acoes">
+    <button class="cta" id="onb-fim">${onbDados.remedios.length?'Concluir':'Concluir sem medicamentos'}</button>
+    <button class="onb-link" id="onb-pular">não toma nada</button>
   </div>`;
 
   el.innerHTML=T[onbTela]||T.t0;
 
   el.querySelectorAll('[data-go]').forEach(function(b){b.onclick=function(){
     if(b.disabled)return;
-    ['nome','email','senha'].forEach(function(k){var c=el.querySelector('#onb-'+k);if(c)onbDados[k]=c.value});
+    ['nome','email','senha','bebe'].forEach(function(k){var c=el.querySelector('#onb-'+k);if(c)onbDados[k]=c.value});
     var cod=el.querySelector('#onb-cod'); if(cod)onbDados.codigo=cod.value;
     var id=b.dataset.go;
     if(id==='t1c'||id==='t1bc'||id==='t2c')onbDados.convidada=true;
@@ -1057,11 +1084,24 @@ function renderOnb(){
   if(fim)fim.onclick=function(){var c=el.querySelector('#onb-bebe');if(c)onbDados.bebe=c.value;onbFim()};
   var pular=el.querySelector('#onb-pular');
   if(pular)pular.onclick=onbFim;
+  var medAdd=el.querySelector('#onb-med-add');
+  if(medAdd)medAdd.onclick=function(){
+    var n=el.querySelector('#onb-med-nome'), d=el.querySelector('#onb-med-dose');
+    var nome=(n.value||'').trim();
+    if(!nome){n.focus();toast('Dê um nome ao medicamento');return}
+    onbDados.remedios.push({nome:nome,dose:(d.value||'').trim()||'sem horário definido'});
+    renderOnb();
+  };
+  el.querySelectorAll('[data-medrm]').forEach(function(b){b.onclick=function(){
+    onbDados.remedios.splice(+b.dataset.medrm,1);renderOnb();
+  }});
 }
+// o nome do bebe ainda nao esta no estado salvo durante o primeiro acesso
+function nomeBebeOnb(){var n=(onbDados.bebe||'').trim();return n||'Seu beb\u00ea'}
 function abrirOnb(){
   onbTela='t0';
   onbDados={nome:'',email:'',senha:'',nascimento:null,prematuro:false,bebe:'',pronome:null,
-    consentCore:false,consentIA:false,codigo:'',convidada:false};
+    consentCore:false,consentIA:false,codigo:'',convidada:false,remedios:[]};
   document.getElementById('onb').classList.add('on');
   renderOnb();
 }
@@ -1189,12 +1229,17 @@ function renderSaude(){
         <div class="end"><span class="badge ${c.feita?'ok':'soft'}">${c.feita?'realizada':new Date(c.quando).toLocaleDateString('pt-BR',{day:'numeric',month:'short'})+' · '+hm(c.quando).replace(':00','h')}</span></div>
       </div>`).join('');
   }else{
-    corpo=S.remedios.map(r=>`
+    corpo=(S.remedios.length?S.remedios.map(r=>`
       <div class="rowcard">
         <div class="ric cal">${ico('pill')}</div>
         <div><div class="t">${r.nome}</div><div class="s">${r.dose}</div></div>
-        <div class="end"><button class="badge ${remedioDado(r)?'ok':'soft'}" onclick="marcarRemedio('${r.id}')">${remedioDado(r)?'dado hoje ✓':'marcar dado'}</button></div>
-      </div>`).join('')+
+        <div class="end" style="display:flex;gap:6px;align-items:center">
+          <button class="badge ${remedioDado(r)?'ok':'soft'}" onclick="marcarRemedio('${r.id}')">${remedioDado(r)?'dado hoje ✓':'marcar dado'}</button>
+          <button class="badge soft" title="Remover" aria-label="Remover ${r.nome}" onclick="removerRemedio('${r.id}')" style="padding:4px 9px">×</button>
+        </div>
+      </div>`).join(''):
+      `<div class="disclaimer" style="text-align:center">Nenhum medicamento cadastrado ainda.</div>`)+
+      `<button class="cta ghost" style="margin-top:10px" onclick="abrirNovoRemedio()">+ Adicionar medicamento</button>`+
       `<div class="disclaimer">Lembretes de medicamento chegam como notificação no app real — aqui é só demonstração.</div>`;
   }
   document.getElementById('view-saude').innerHTML=`
@@ -1217,7 +1262,39 @@ function marcarRemedio(id){
   const r=S.remedios.find(x=>x.id===id);if(!r)return;
   const hojeStr=new Date().toDateString();
   const dado=r.dadoEm&&new Date(r.dadoEm).toDateString()===hojeStr;
-  r.dadoEm=dado?null:Date.now();save();toast(dado?'Desmarcado':'Vitamina D marcada como dada');renderSaude();
+  r.dadoEm=dado?null:Date.now();save();toast(dado?'Desmarcado':`${r.nome} marcada como dada`);renderSaude();
+}
+function abrirNovoRemedio(){
+  const el=document.getElementById('sheet-remedio');
+  el.innerHTML=`
+    <div class="grab"></div>
+    <h5>Adicionar medicamento</h5>
+    <p class="hint">Fica na aba Remédios e entra no resumo da consulta.</p>
+    <input class="onb-campo" id="med-nome" placeholder="Nome (ex.: Vitamina D)" autocomplete="off">
+    <input class="onb-campo" id="med-dose" placeholder="Dose e horário (ex.: 1 gota · manhã)" autocomplete="off" style="margin-top:8px">
+    <div class="disclaimer">A dose é sempre a que o pediatra ${possessivoBebe()} indicou — o app só lembra do horário.</div>
+    <button class="cta" id="med-ok">Adicionar</button>
+    <button class="cta ghost" id="med-cancel">cancelar</button>
+  `;
+  const nome=el.querySelector('#med-nome'), dose=el.querySelector('#med-dose');
+  el.querySelector('#med-ok').onclick=()=>{
+    const n=(nome.value||'').trim();
+    if(!n){nome.focus();toast('Dê um nome ao medicamento');return}
+    const r={id:'med'+Date.now(),nome:n,dose:(dose.value||'').trim()||'sem horário definido',dadoEm:null};
+    S.remedios.push(r);save();closeSheets();pulseFila();abaSaude='remedios';renderAll();
+    toast(`${r.nome} adicionado`,()=>{
+      S.remedios=S.remedios.filter(x=>x.id!==r.id);save();renderAll();toast('Removido');
+    });
+  };
+  el.querySelector('#med-cancel').onclick=closeSheets;
+  openSheet('sheet-remedio');
+  setTimeout(()=>nome.focus(),80);
+}
+function removerRemedio(id){
+  const i=S.remedios.findIndex(x=>x.id===id); if(i<0)return;
+  const r=S.remedios[i];
+  S.remedios.splice(i,1);save();renderSaude();
+  toast(`${r.nome} removido`,()=>{S.remedios.splice(i,0,r);save();renderSaude();toast('De volta à lista')});
 }
 
 function renderPerfil(){
