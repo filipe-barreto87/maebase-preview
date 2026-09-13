@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/maebase-preview/sw.js', { scope: '/maebase-preview/' })})}
